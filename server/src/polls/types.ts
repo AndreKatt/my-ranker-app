@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 // service types
 export type CreatePollFields = {
   topic: string;
@@ -29,3 +31,12 @@ export type AddParticipantData = {
   userID: string;
   name: string;
 };
+
+// guard types
+type AuthPayload = {
+  userID: string;
+  pollID: string;
+  name: string;
+};
+
+export type RequestAuth = Request & AuthPayload;
