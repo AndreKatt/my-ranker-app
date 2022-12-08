@@ -1,5 +1,11 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { 
+	CanActivate,
+	ExecutionContext,
+	ForbiddenException,
+	Injectable,Logger
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { RequestAuth } from './types';
 
 @Injectable()
 export class ControllerAuthGuard implements CanActivate {
@@ -7,7 +13,7 @@ export class ControllerAuthGuard implements CanActivate {
 	constructor(private readonly jwtService: JwtService) {}
 
 	canActivate(context: ExecutionContext): boolean | Promise<boolean> {
-		const request = context.switchToHttp().getRequest();
+		const request: RequestAuth = context.switchToHttp().getRequest();
 
 		this.logger.debug(`Checken for auth token on requestt body`, request.body);
 
