@@ -1,4 +1,5 @@
-import { BadRequestException, Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common/decorators';
 import { 
 	OnGatewayInit, 
 	WebSocketGateway, 
@@ -6,9 +7,12 @@ import {
 	OnGatewayDisconnect,
 	WebSocketServer,
 	SubscribeMessage,
+	MessageBody,
+	ConnectedSocket,
 } from '@nestjs/websockets';
 import { Namespace } from 'socket.io';
-import { WsCatchAllFilter } from 'src/exceptions/ws-catch-all-filter';
+import { WsCatchAllFilter } from '../exceptions/ws-catch-all-filter';
+import { GatewayAdminGuard } from './gateway-admin.guard';
 import { PollsService } from './polls.service';
 import { SocketWithAuth } from './types';
 
@@ -83,8 +87,23 @@ export class PollsGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
 		}
 	}
 
-	@SubscribeMessage('test')
-	async test() {
-		throw new BadRequestException('message');
+	@UseGuards(GatewayAdminGuard)
+	@SubscribeMessage('remove_participant')
+	async removeParticipant(
+		@MessageBody('id') id: string,
+		@ConnectedSocket() client: SocketWithAuth,
+	) {
+		this.logger.debug(
+			`Attepting to remove participant ${id} from poll ${client.pollID}`,
+		);
+
+		const updatedPoll = await this.pollsService.removeParticipant(
+			client.pollID,
+			id,
+		);
+
+		if (updatedPoll) {
+			this.io.to(client.pollID).emit('poll_updated', updatedPoll);
+		}
 	}
 }
