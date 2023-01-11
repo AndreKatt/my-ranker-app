@@ -1,24 +1,30 @@
 export type Participants = {
-	[participantID: string]: string;
-}
+  [participantID: string]: string;
+};
 
 export type Nomination = {
-	userID: string;
-	text: string;
-}
+  userID: string;
+  text: string;
+};
+
+type NominationID = string;
 
 export type Nominations = {
-[nominationID: string]: Nomination;
-}
+  [nominationID: NominationID]: Nomination;
+};
+
+export type Rankings = {
+  [userID: string]: NominationID[];
+};
 
 export type Poll = {
-	id: string;
-	topic: string;
-	votesPerVoter: number;
-	participants: Participants;
-	adminID: string;
-	nominations: Nominations;
-	// rankings: Rankings;
-	// results: Results;
-	hasStarted: boolean;
-}
+  id: string;
+  topic: string;
+  votesPerVoter: number;
+  participants: Participants;
+  adminID: string;
+  nominations: Nominations;
+  rankings: Rankings;
+  // results: Results;
+  hasStarted: boolean;
+};
